@@ -5,7 +5,9 @@ const { ObjectId } = require("mongodb");
 const getCrmDb = require("./index");
 const { validateBody, Joi } = require("../../utils/validate");
 const { authenticateJWT } = require("../../utils/authMiddleware");
-const JWT_SECRET = "your_jwt_secret_key_here";
+
+// Use environment variable for JWT secret, fallback for development
+const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret_key_here";
 
 const router = express.Router();
 

@@ -1,10 +1,12 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const getCrmDb = require("./index");
-const { validateBody, Joi } = require("../../utils/validate");
-const JWT_SECRET = "your_jwt_secret_key_here";
 const { ObjectId } = require("mongodb");
+const getEcommerceDb = require("./index");
+const { validateBody, Joi } = require("../../utils/validate");
+
+// Use environment variable for JWT secret, fallback for development
+const JWT_SECRET = process.env.JWT_SECRET;
 
 const router = express.Router();
 
@@ -15,7 +17,7 @@ const loginSchema = Joi.object({
 router.post("/login", validateBody(loginSchema), async (req, res) => {
   const { userName, password } = req.body;
   try {
-    const db = await getCrmDb();
+    const db = await getEcommerceDb();
     const usersCollection = db.collection("users");
     const user = await usersCollection.findOne({ userName });
     if (!user) {
@@ -25,9 +27,13 @@ router.post("/login", validateBody(loginSchema), async (req, res) => {
     if (!passwordMatch) {
       return res.status(401).json({ message: "Password is incorrect." });
     }
-    const token = jwt.sign({ _id: user._id, userName: user.userName }, JWT_SECRET, {
-      expiresIn: "1h",
-    });
+    const token = jwt.sign(
+      { _id: user._id, userName: user.userName },
+      JWT_SECRET,
+      {
+        expiresIn: "1h",
+      }
+    );
     res.json({
       message: "Login successful.",
       token,
@@ -48,9 +54,9 @@ const registerSchema = Joi.object({
 router.post("/register", validateBody(registerSchema), async (req, res) => {
   const { email, password, userName } = req.body;
   try {
-    const db = await getCrmDb();
-    const usersCollection = db.collection("users"); 
-    
+    const db = await getEcommerceDb();
+    const usersCollection = db.collection("users");
+
     // Check for duplicate userName
     const existingUserName = await usersCollection.findOne({ userName });
     if (existingUserName) {
@@ -76,7 +82,7 @@ router.post("/register", validateBody(registerSchema), async (req, res) => {
     await profileCollection.insertOne({
       _id: userId,
       userName: userName,
-      email: email
+      email: email,
     });
 
     res.status(201).json({ message: "User registered successfully." });

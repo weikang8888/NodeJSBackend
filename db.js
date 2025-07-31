@@ -1,5 +1,6 @@
 const { MongoClient, ServerApiVersion } = require("mongodb");
 require("dotenv").config();
+
 const uri = process.env.MONGO_URI;
 
 const client = new MongoClient(uri, {
@@ -12,14 +13,20 @@ const client = new MongoClient(uri, {
 
 const dbCache = {};
 
-async function connectToMongo(dbName) {
+async function connectToMongo(dbName = "crm") {
   if (dbCache[dbName]) return dbCache[dbName];
-  await client.connect();
-  const db = client.db(dbName);
-  await db.command({ ping: 1 });
-  console.log(`Connected to MongoDB Atlas! DB: ${dbName}`);
-  dbCache[dbName] = db;
-  return db;
+  
+  try {
+    await client.connect();
+    const db = client.db(dbName);
+    await db.command({ ping: 1 });
+    console.log(`Connected to MongoDB Atlas! DB: ${dbName}`);
+    dbCache[dbName] = db;
+    return db;
+  } catch (error) {
+    console.error("Failed to connect to MongoDB:", error);
+    throw error;
+  }
 }
 
 module.exports = { client, connectToMongo };
