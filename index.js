@@ -17,8 +17,11 @@ const EcommerceBlogRouter = require("./routes/ecommerce/blog");
 const { connectToMongo } = require("./db");
 const path = require("path");
 
+// Load environment variables
+require('dotenv').config();
+
 const app = express();
-const port = 3005;
+const port = process.env.PORT;
 
 app.use(cors());
 app.use(express.json());
