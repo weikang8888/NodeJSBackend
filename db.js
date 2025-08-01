@@ -3,13 +3,34 @@ require("dotenv").config();
 
 const uri = process.env.MONGO_URI;
 
-const client = new MongoClient(uri, {
+// Standard connection options
+const clientOptions = {
   serverApi: {
     version: ServerApiVersion.v1,
     strict: true,
     deprecationErrors: true,
   },
-});
+  ssl: true,
+  tls: true,
+  connectTimeoutMS: 30000,
+  socketTimeoutMS: 30000,
+};
+
+// Fallback options for SSL issues (more permissive)
+const fallbackOptions = {
+  serverApi: {
+    version: ServerApiVersion.v1,
+    strict: true,
+    deprecationErrors: true,
+  },
+  ssl: true,
+  tls: true,
+  tlsAllowInvalidCertificates: true,
+  connectTimeoutMS: 30000,
+  socketTimeoutMS: 30000,
+};
+
+const client = new MongoClient(uri, clientOptions);
 
 const dbCache = {};
 
@@ -24,7 +45,25 @@ async function connectToMongo(dbName = "crm") {
     dbCache[dbName] = db;
     return db;
   } catch (error) {
-    console.error("Failed to connect to MongoDB:", error);
+    console.error("Failed to connect to MongoDB with standard options:", error);
+    
+    // Try with fallback options if SSL error occurs
+    if (error.message.includes('SSL') || error.message.includes('TLS')) {
+      console.log("Attempting connection with fallback SSL options...");
+      try {
+        const fallbackClient = new MongoClient(uri, fallbackOptions);
+        await fallbackClient.connect();
+        const db = fallbackClient.db(dbName);
+        await db.command({ ping: 1 });
+        console.log(`Connected to MongoDB Atlas with fallback options! DB: ${dbName}`);
+        dbCache[dbName] = db;
+        return db;
+      } catch (fallbackError) {
+        console.error("Failed to connect with fallback options:", fallbackError);
+        throw fallbackError;
+      }
+    }
+    
     throw error;
   }
 }
