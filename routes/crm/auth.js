@@ -7,7 +7,7 @@ const { validateBody, Joi } = require("../../utils/validate");
 const { authenticateJWT } = require("../../utils/authMiddleware");
 
 // Use environment variable for JWT secret, fallback for development
-const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret_key_here";
+const JWT_SECRET = process.env.JWT_SECRET;
 
 const router = express.Router();
 
