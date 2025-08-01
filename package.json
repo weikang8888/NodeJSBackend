@@ -5,12 +5,19 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon index.js",
-    "start": "node index.js"
+    "start": "node index.js",
+    "build": "echo 'No build step required'",
+    "deploy:render": "echo 'Deploy to Render: Connect your GitHub repo to Render'",
+    "deploy:vercel": "vercel --prod",
+    "deploy:railway": "echo 'Deploy to Railway: Connect your GitHub repo to Railway'"
   },
-  "keywords": [],
+  "keywords": ["crm", "ecommerce", "api", "nodejs", "express", "mongodb"],
   "author": "",
   "license": "ISC",
-  "description": "",
+  "description": "Combined CRM and Ecommerce API server",
+  "engines": {
+    "node": ">=16.0.0"
+  },
   "dependencies": {
     "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
