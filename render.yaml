@@ -5,10 +5,15 @@ services:
     plan: free
     buildCommand: npm install
     startCommand: npm start
+    nodeVersion: 18.20.0
     envVars:
       - key: NODE_ENV
         value: production
       - key: MONGO_URI
         sync: false
       - key: JWT_SECRET
-        sync: false 
+        sync: false
+      - key: NODE_TLS_REJECT_UNAUTHORIZED
+        value: "0"
+      - key: CRM_DB_NAME
+        value: "crm" 
