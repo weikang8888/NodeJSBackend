@@ -13,6 +13,7 @@ const EcommerceProductRouter = require("./routes/ecommerce/product");
 const EcommerceCartRouter = require("./routes/ecommerce/cart");
 const EcommerceWishRouter = require("./routes/ecommerce/wish");
 const EcommerceBlogRouter = require("./routes/ecommerce/blog");
+const EcommerceEmailRouter = require("./routes/ecommerce/email");
 
 const { connectToMongo } = require("./db");
 const path = require("path");
@@ -43,6 +44,7 @@ app.use("/ecommerce/products", EcommerceProductRouter);
 app.use("/ecommerce/cart", EcommerceCartRouter);
 app.use("/ecommerce/wish", EcommerceWishRouter);
 app.use("/ecommerce/blog", EcommerceBlogRouter);
+app.use("/ecommerce/email", EcommerceEmailRouter);
 
 app.use("/uploads", express.static(path.join(__dirname, "routes/crm/uploads")));
 app.use(
