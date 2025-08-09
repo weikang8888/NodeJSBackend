@@ -92,3 +92,5 @@ router.post("/register", validateBody(registerSchema), async (req, res) => {
       .json({ message: "Registration failed.", error: err.message });
   }
 });
+
+module.exports = router;

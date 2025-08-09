@@ -163,6 +163,7 @@ router.delete("/delete/:id", authenticateJWT, async (req, res) => {
     const mentorsCollection = db.collection("mentors");
     const usersCollection = db.collection("users");
     const profileCollection = db.collection("profile");
+    const tasksCollection = db.collection("tasks"); // Add this line to get the tasks collection
     // Delete from mentors, users, and profile collections
     const mentorResult = await mentorsCollection.findOneAndDelete({
       _id: mentorId,
@@ -173,6 +174,11 @@ router.delete("/delete/:id", authenticateJWT, async (req, res) => {
     const profileResult = await profileCollection.findOneAndDelete({
       _id: mentorId,
     });
+    // Remove mentorId from all tasks that reference this mentor
+    await tasksCollection.updateMany(
+      { mentorId: mentorId },
+      { $unset: { mentorId: "" } }
+    );
     if (!mentorResult) {
       return res.status(404).json({ message: "Mentor not found." });
     }

@@ -1,13 +1,19 @@
 const express = require("express");
 const cors = require("cors");
+const session = require("express-session");
+const { passport } = require("./utils/passportConfig");
+
 const authRouter = require("./routes/crm/auth");
+const googleRouter = require("./routes/crm/google");
 const profileRouter = require("./routes/crm/profile");
 const taskRouter = require("./routes/crm/task");
 const mentorRouter = require("./routes/crm/mentor");
 const memberRouter = require("./routes/crm/member");
 const uploadRouter = require("./routes/crm/upload");
+const { router: notificationRouter } = require("./routes/crm/notification");
 
 const EcommerceAuthRouter = require("./routes/ecommerce/auth");
+const EcommerceGoogleRouter = require("./routes/ecommerce/google");
 const EcommerceProfileRouter = require("./routes/ecommerce/profile");
 const EcommerceProductRouter = require("./routes/ecommerce/product");
 const EcommerceCartRouter = require("./routes/ecommerce/cart");
@@ -27,18 +33,33 @@ const port = process.env.PORT;
 app.use(cors());
 app.use(express.json());
 
+// Session configuration
+app.use(session({
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  cookie: { secure: false } // Set to true in production with HTTPS
+}));
+
+// Initialize Passport
+app.use(passport.initialize());
+app.use(passport.session());
+
 app.get("/", (req, res) => {
   res.send("Hello from Express + MongoDB Atlas!");
 });
 
 app.use("/crm/auth", authRouter);
+app.use("/crm/google", googleRouter);
 app.use("/crm/profile", profileRouter);
 app.use("/crm/task", taskRouter);
 app.use("/crm/mentor", mentorRouter);
 app.use("/crm/member", memberRouter);
 app.use("/crm/upload", uploadRouter);
+app.use("/crm/notification", notificationRouter);
 
 app.use("/ecommerce/auth", EcommerceAuthRouter);
+app.use("/ecommerce/google", EcommerceGoogleRouter);
 app.use("/ecommerce/profile", EcommerceProfileRouter);
 app.use("/ecommerce/products", EcommerceProductRouter);
 app.use("/ecommerce/cart", EcommerceCartRouter);

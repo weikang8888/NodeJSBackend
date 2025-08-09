@@ -175,6 +175,7 @@ router.delete("/delete/:id", authenticateJWT, async (req, res) => {
     const membersCollection = db.collection("members");
     const usersCollection = db.collection("users");
     const profileCollection = db.collection("profile");
+    const tasksCollection = db.collection("tasks");
     // Delete from members, users, and profile collections
     const memberResult = await membersCollection.findOneAndDelete({
       _id: memberId,
@@ -185,6 +186,18 @@ router.delete("/delete/:id", authenticateJWT, async (req, res) => {
     const profileResult = await profileCollection.findOneAndDelete({
       _id: memberId,
     });
+    // Remove memberId and memberProgress for this member from all tasks
+    await tasksCollection.updateMany(
+      {
+        $or: [{ memberId: memberId }, { "memberProgress.memberId": memberId }],
+      },
+      {
+        $pull: {
+          memberId: memberId,
+          memberProgress: { memberId: memberId },
+        },
+      }
+    );
     if (!memberResult) {
       return res.status(404).json({ message: "Member not found." });
     }
